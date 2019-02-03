@@ -5,7 +5,6 @@
 | |___|  _  |___) |   \ V / | |___| |\  | |_| | || |\  | |_| | | |  | |/ ___ \ |___|  _  || || |\  | |___
 |_____|_| |_|____/     \_/  |_____|_| \_|____/___|_| \_|\____| |_|  |_/_/   \_\____|_| |_|___|_| \_|_____|
 Written to stop tgreer from throwing the vending machine away
-I'm bad at programming
 */
 
 #include <EthernetUdp.h>
@@ -31,18 +30,19 @@ PN532_HSU pnhsu(Serial6);
 PN532 nfc(pnhsu);
 volatile int cashinserted; //Used in ISR, has to be volatile
 volatile boolean changed = true;
+long lastvend = 0;
 int inhibitpin = PP_3;
-int Coin10Pin = PG_0; //The coin mech pulls these pins down (*AND APPARENTLY UP TO 12V SOMETIMES) if an appropriate coin is accepted
-int Coin20Pin = PB_4;//Interfacing with the coin mech directly is difficult and can only be done by the PL2303 for some reason
-int Coin50Pin = PB_5;//COIN MECH (Weird serial-like interface(CCTALK)) --> PL2303 --> Raspberry Pi --> Launchpad
+int Coin10Pin = PG_0; //The coin mech pulls these pins down if an appropriate coin is accepted
+int Coin20Pin = PB_4;
+int Coin50Pin = PB_5;
 int Coin100Pin = PK_0;
 int Coin200Pin = PK_1;
 int selection[] = {-1, -1}; //Sets default unselected selection
 int itemtovend;
 int stock[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-int cost[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+String cost[] = {"0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"};
 int restock;
-int motors[] = {PH_3, PH_2, PL_3, PL_2, PL_1, PN_2, PN_3, PP_2, PH_0, PP_4, PD_4, PA_7, PP_5, PK_7, PK_6, PH_1};//Pins for all 16 Motors - easier to declare
+int motors[] = {PN_3, PK_6, PH_1, PK_6, PH_1};
 boolean undispensed = true;
 int buttonState[10];
 int lastButtonState[] = {LOW, LOW, LOW, LOW, LOW, LOW, LOW, LOW, LOW, LOW};
@@ -54,17 +54,16 @@ long lastcardscan = 0;
 byte mac_addr[] = {0x00, 0x1A, 0xB6, 0x02, 0xA2, 0x00};
 char newbalance[] = "0.0";
 unsigned long lastdeclare;
-String currentuser;
-IPAddress server_addr(123,123,123,123); // SQL SERVER
+String currentuser = "-1";
+String uidstring = "-1";
+IPAddress server_addr(206,189,115,163);
 EthernetClient client;
-String hostname = "abc.xyz";
-IPAddress acserver(123,123,123,123);
-String nodeid = "xx";
-String secret = "xxxxxxxxxxxxx";
-MySQL_Connection conn((Client *)&client);
-MySQL_Cursor cur = MySQL_Cursor(&conn);
-char user[] = "vend";              // MySQL user login username
-char password[] = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";        // MySQL user login password
+String hostname = "acserver.lan.london.hackspace.org.uk";
+
+char acserver[] = "acserver.lan.london.hackspace.org.uk";
+String nodeid = "xxxxxxx";
+String secret = "xxxxxxx";
+
 char UPDATE_BALANCE[100];
 char AUTH_QUERY[100];
 char BALANCE_QUERY[100];
@@ -72,24 +71,25 @@ char STOCK_QUERY[100];
 char vendarr[2];
 bool authstat;
 long requestedbalance;
-String uidstring = "0";
-const byte ROWS = 4;
-const byte COLS = 3;
-char keys[ROWS][COLS] = {
-  {'1','2','3'},
-  {'4','5','6'},
-  {'7','8','9'},
-  {'*','0','#'}
-};
-byte rowPins[ROWS] = {PE_4, PE_0, PE_1, PE_2};
-byte colPins[COLS] = {PE_3, PD_7, PA_6};
-Keypad keypad = Keypad( makeKeymap(keys), rowPins, colPins, ROWS, COLS );
-
+bool timedout = true;
+//const byte ROWS = 4;
+//const byte COLS = 3;
+//char keys[ROWS][COLS] = {
+//  {'1','2','3'},
+//  {'4','5','6'},
+//  {'7','8','9'},
+//  {'*','0','#'}
+//};
+//byte rowPins[ROWS] = {PE_4, PE_0, PE_1, PE_2};
+//byte colPins[COLS] = {PE_3, PD_7, PA_6};
+//Keypad keypad = Keypad( makeKeymap(keys), rowPins, colPins, ROWS, COLS );
+int item1select = PE_4;
+int item2select = PE_0;
+int item3select = PE_1;
 
 
 
 String getUID(){
-  String uidstring;
   boolean success;
   uint8_t uid[] = { 0, 0, 0, 0, 0, 0, 0 };  // Buffer to store the returned UID
   uint8_t uidLength;                        // Length of the UID (4 or 7 bytes depending on ISO14443A card type)
@@ -98,33 +98,39 @@ String getUID(){
   // if the uid is 4 bytes (Mifare Classic) or 7 bytes (Mifare Ultralight)
   success = nfc.readPassiveTargetID(PN532_MIFARE_ISO14443A, &uid[0], &uidLength);
   if(success){
+    String functionuidstring;
   //lcd.clear();
   //lcd.setCursor(0, 0);
-  Serial.println("Found a card!");
-  lastcardscan = millis();
-  for (uint8_t i=0; i < uidLength; i++)
-  {
-    if(uid[i] < 10){
-      uidstring = uidstring + "0";
+    Serial.println("Found a card!");
+    lastcardscan = millis();
+    for (uint8_t i=0; i < uidLength; i++)
+    {
+      if(uid[i] < 10){
+        functionuidstring = functionuidstring + "0";
+      }
+      functionuidstring = functionuidstring + String(uid[i], HEX);
     }
-    uidstring = uidstring + String(uid[i], HEX);
+    functionuidstring.toUpperCase();
+    return functionuidstring;
   }
-  uidstring.toUpperCase();
-  return uidstring;
-  }else{
-  return "0";
-  }
+  return "-1";
 }
 
 
 
 
 void updateuserbalance(String id, int money){
+  Serial.println("THE UPDATER ID = ");
+  Serial.print(id);
+  Serial.println("");
+  if(id == "-1"){
+    return;
+  }
   if (conn.connect(server_addr, 3306, user, password)) {
-    delay(10);
+    delay(100);
   }
   else{
-    Serial.println("Connection failed. (Someone might have just lost or gained money?)");
+    Serial.println("Connection failed. Someone may have lost or gained money");
   }
   char UPDATE_BALANCE[100];
   String cashstring = String(money);
@@ -133,6 +139,7 @@ void updateuserbalance(String id, int money){
   Serial.println("");
   String updaterequest = "UPDATE vend.users SET BALANCE = '" + cashstring + "' WHERE ID = '" + id + "'";
   updaterequest.toCharArray(UPDATE_BALANCE, 100);
+  Serial.print(UPDATE_BALANCE);
   MySQL_Cursor *cur_mem = new MySQL_Cursor(&conn);
 // Execute the query
   cur_mem->execute(UPDATE_BALANCE);
@@ -145,23 +152,27 @@ void updateuserbalance(String id, int money){
 
 
 
-int getuserbalance(String id){
+int getuserbalance(String requestid){
+  Serial.println("Balance is being requested. Connecting...");
+  String requestident = requestid;
+  if((requestident.toInt()) < 0){
+    return 0;
+  }
   if (conn.connect(server_addr, 3306, user, password)) {
-    delay(10);
+    delay(100);
   }
   else{
-    Serial.println("Connection failed.");
+    Serial.println("Connection failed. (user)");
     return 0;
   }
   row_values *row = NULL;
   char BALANCE_QUERY[100];
-  String authquery = "SELECT BALANCE FROM vend.users WHERE ID = '" + id + "'";
+  String authquery = "SELECT BALANCE FROM vend.users WHERE ID = '" + requestid + "'";
   authquery.toCharArray(BALANCE_QUERY, 100);
   cur.execute(BALANCE_QUERY);
 // Fetch the columns (required) but we don't use them.
   if(cur.get_columns() == NULL){
-    Serial.print("That Card looks INVALID");
-    return 0;
+    Serial.print("That Card looks invalid");
   }
 // Read the row (we are only expecting the one)
   do {
@@ -179,16 +190,16 @@ int getuserbalance(String id){
   return int(requestedbalance);
 }
 
-void reducestock(int x, int y){
+void reducestock(String x, String y){
   if (conn.connect(server_addr, 3306, user, password)) {
     delay(10);
   }
   else{
-    Serial.println("Connection failed. Stock on database now out of sync. Local stock counters still ok.");
+    Serial.println("Connection failed. STOCK");
   }
   char UPDATE_STOCK[100];
-  int NEWQUANTITY = y - 1;
-  sprintf(UPDATE_STOCK, "UPDATE vend.stock SET quantity = '%i' WHERE place = '%i'", NEWQUANTITY, y);
+  String stockupdatestring = "UPDATE vend.stock SET quantity = '" + x + "' WHERE place = '" + y + "'";
+  stockupdatestring.toCharArray(UPDATE_STOCK, 100);
   MySQL_Cursor *cur_mem = new MySQL_Cursor(&conn);
 // Execute the query
   cur_mem->execute(UPDATE_STOCK);
@@ -201,16 +212,16 @@ void reducestock(int x, int y){
 
 
 void cash10() {
-  cashinserted = cashinserted + 10;
-  changed = true;
-  while(digitalRead(Coin10Pin) == LOW){
-  }
+  //cashinserted = cashinserted + 10;
+  //changed = true;
+  //while(digitalRead(Coin10Pin) == LOW){
+  //}
 }
 void cash20() {
-  cashinserted = cashinserted + 20;
-  changed = true;
-  while(digitalRead(Coin20Pin) == LOW){
-  }
+  //cashinserted = cashinserted + 20;
+  //changed = true;
+  //while(digitalRead(Coin20Pin) == LOW){
+  //}
 }
 void cash50() {
   cashinserted = cashinserted + 50;
@@ -265,12 +276,10 @@ void selectiondeclare(int key){//checks which
 
 
 
-void dispense(int sel){       //THIS PROBABLY DOESN'T WORK
+void dispense(int sel){
   motorvalue = sel - 1;
   digitalWrite(motors[motorvalue], HIGH);
-  while(digitalRead(comparator1pin) == LOW){
-    digitalWrite(motors[motorvalue], HIGH);
-  }
+  delay(1000);
   digitalWrite(motors[motorvalue], LOW);
 }
 
@@ -281,27 +290,31 @@ void dispense(int sel){       //THIS PROBABLY DOESN'T WORK
 
 //VEND
 void vend(int x, boolean y) {
-  motorvalue = x - 1;
-  if(motorvalue < 15){
-    if(y == false){
-      if(cashinserted >= cost[motorvalue]){
-        Serial.println("VENDING...");
-        cashinserted = cashinserted - cost[motorvalue];//Takes away money from balance
-        changed = true;
-        stock[motorvalue] = stock[motorvalue] - 1;
-      }else if(stock[motorvalue] <= 0){
-        Serial.println("OUT OF STOCK");
-        lcd.clear();
-        lcd.setCursor(0, 0);
-        lcd.print("OUT OF STOCK");
-        changed = 1;
-      }
-      else{
-        Serial.println("Insufficient funds");
-      }
+  if((millis() - lastvend) > 5000){
+    lastvend = millis();
+    motorvalue = x - 1;
+    if(motorvalue < 15){
+      if(stock[motorvalue] <= 0){
+        if(cashinserted >= cost[motorvalue].toInt()){
+          Serial.println("VENDING...");
+          Serial.println("Removing");
+          Serial.println(cost[motorvalue].toInt());
+          cashinserted = (cashinserted - cost[motorvalue].toInt());//Takes away money from balance
+          changed = true;
+          stock[motorvalue] = stock[motorvalue] - 1;
+          reducestock(String(stock[motorvalue]), String(motorvalue + 1));
+          dispense(x);
+        }else{
+          Serial.println("Insufficient funds");
+        }
+    }else{
+      Serial.println("No Stock");
+      lcd.clear();
+      lcd.println("Out Of Stock");
+      delay(3000);
+      changed = 1;
     }
-}else{
-  Serial.println("IDIOT");
+  }
 }
 }
 
@@ -312,6 +325,8 @@ String userinfo(String card){
   String hostheader = "Host: " + hostname;
   String keyheader = "X-AC-Key: " + secret;
   Serial.println("Connecting");
+  Serial.println(card);
+  Serial.println("is the UID");
   client.setTimeout(1000);
   if (!client.connect(acserver, 1234)) {
     Serial.println(F("Connection failed"));
@@ -330,7 +345,7 @@ String userinfo(String card){
   }
   char status[64] = {0};
   client.readBytesUntil('\r', status, sizeof(status));
-  if (strcmp(status, "HTTP/1.0 200 OK") != 0) {
+  if (strcmp(status, "HTTP/1.1 200 OK") != 0) {
     Serial.print(F("Unexpected response: "));
     Serial.println(status);
     return "ERROR";
@@ -361,19 +376,24 @@ String userinfo(String card){
 //SETUP
 void setup() {
   Serial.begin(115200);
+  delay(5000);
+  lastvend = millis();
   Serial.println("I'm ALIVE!");
   //lcd.begin(16, 2);
-  pinMode(Coin10Pin, INPUT_PULLDOWN);
-  pinMode(Coin20Pin, INPUT_PULLDOWN);
-  pinMode(Coin50Pin, INPUT_PULLDOWN);
-  pinMode(Coin100Pin, INPUT_PULLDOWN);
-  pinMode(Coin200Pin, INPUT_PULLDOWN);
+  pinMode(Coin10Pin, INPUT_PULLUP);
+  pinMode(Coin20Pin, INPUT_PULLUP);
+  pinMode(Coin50Pin, INPUT_PULLUP);
+  pinMode(Coin100Pin, INPUT_PULLUP);
+  pinMode(Coin200Pin, INPUT_PULLUP);
+  pinMode(item1select, INPUT_PULLUP);
+  pinMode(item2select, INPUT_PULLUP);
+  pinMode(item3select, INPUT_PULLUP);
   pinMode(inhibitpin, OUTPUT);
-  attachInterrupt(Coin10Pin, cash10, RISING); //Interrupts for cash (Money NEEDS to be counted, therefore interrupts are used)
-  attachInterrupt(Coin20Pin, cash20, RISING);//Without interrupts, money wouldn't be counted while the motor spins.
-  attachInterrupt(Coin50Pin, cash50, RISING);
-  attachInterrupt(Coin100Pin, cash100, RISING);
-  attachInterrupt(Coin200Pin, cash200, RISING);
+  attachInterrupt(Coin10Pin, cash10, LOW); //Interrupts for cash (Money NEEDS to be counted, therefore interrupts are used)
+  attachInterrupt(Coin20Pin, cash20, LOW);//Without interrupts, money wouldn't be counted while the motor spins.
+  attachInterrupt(Coin50Pin, cash50, LOW);
+  attachInterrupt(Coin100Pin, cash100, LOW);
+  attachInterrupt(Coin200Pin, cash200, LOW);
   Ethernet.begin(mac_addr);
   Serial.println("Connecting...");
   if (conn.connect(server_addr, 3306, user, password)) {
@@ -381,10 +401,10 @@ void setup() {
   }
   else
     Serial.println("Connection failed.");
-  for(int i=0; i < 15; i++){
+  for(int i=0; i < 5; i++){
     pinMode(motors[i], OUTPUT);
   }
-  pinMode(comparator1pin, INPUT_PULLUP);
+  //pinMode(comparator1pin, INPUT_PULLUP);
   pinMode(comparator2pin, INPUT_PULLUP);
   row_values *row = NULL;
   for(int i=0; i < 16; i++){
@@ -408,7 +428,7 @@ void setup() {
     Serial.println(" = ");
     Serial.print(stock[i], DEC);
   }
-  for (int i = 0; i < 17; i++) {
+  for (int i = 0; i < 16; i++) {
     char PRICE_QUERY[100];
     int j = i + 1;
     sprintf(PRICE_QUERY, "SELECT PRICE FROM vend.stock WHERE place ='%i'", j);
@@ -419,17 +439,17 @@ void setup() {
     do {
       row = cur.get_next_row();
       if (row != NULL) {
-        cost[i] = atol(row->values[0]);
+        cost[i] = String(row->values[0]);
       }
     } while (row != NULL);
 // Now we close the cursor to free any memory
     cur.close();
-    conn.close();
     Serial.println("PRICE OF ");
     Serial.print(j, DEC);
     Serial.println(" = ");
-    Serial.print(cost[i], DEC);
+    Serial.print(cost[i]);
   }
+  conn.close();
   nfc.begin();
   //nfc.setPassiveActivationRetries(0xFF);
   nfc.setPassiveActivationRetries(0xFF);
@@ -451,6 +471,7 @@ void setup() {
 
 //LOOP
 void loop() {                   // Length of the UID (4 or 7 bytes depending on ISO14443A card type)
+  /*
   char keypadkey = keypad.getKey();
   if(keypadkey){
     if((keypadkey == '#') && (selection[0] != -1) && (selection[1] != -1)){
@@ -459,51 +480,78 @@ void loop() {                   // Length of the UID (4 or 7 bytes depending on 
       selection[1] = -1;
     }
   }
-
+  */
+  //Serial.println("LOOP IS LOOPING");
+  if(digitalRead(item1select) == LOW){
+    vend(1, false);
+  }
+  if(digitalRead(item2select) == LOW){
+    vend(2, false);
+  }
+  if(digitalRead(item2select) == LOW){
+    vend(3, false);
+  }
   if(changed == true){
+    lastcardscan = millis();
     lcd.clear();
     lcd.setCursor(0, 0);
-    lcd.print("Current Balance");
+    lcd.print("WELCOME TO LHS");
     lcd.setCursor(0, 1);
     lcd.print("Bal:");
     float poundbalance = cashinserted;
     poundbalance = poundbalance / 100;
     lcd.print(String(poundbalance));
-    lcd.print(" GBP"); // LCD DOES NOT SUPPORT £ SYMBOL
+    lcd.print(" GBP");
     Serial.println(String(cashinserted));
     changed = false;
   }
-  if((digitalRead(comparator1pin) == LOW) && (digitalRead(comparator2pin) == LOW)){  //Motor is stuck?
-    cutmotor();
-  }
 
-  if(((millis() - lastcardscan) > 45000) && currentuser != "-1"){//timeout of card
+  //success = nfc.readPassiveTargetID(PN532_MIFARE_ISO14443A, &uid[0], &uidLength);
+  //if(success){
+  if((millis() - lastcardscan) > 6000 && timedout == false){
+    Serial.print("TIMEOUT TRIGGERED!");
     digitalWrite(inhibitpin, HIGH);
     updateuserbalance(currentuser, cashinserted);
     currentuser = "-1";
     cashinserted = 0;
-    changed = 1;
+    changed = true;
+    timedout = true;
 
   }
-  uidstring = getUID();
-  if(uidstring != "0"){
-    String currentuser = userinfo(uidstring);
-    if(currentuser == "ERROR"){
-      Serial.println("ACSERVER QUERY ERROR (MOST LIKELY INVALID)");
-      lcd.clear();
-      lcd.setCursor(0,0);
-      lcd.println("ACSERVER ERROR");
-      lcd.setCursor(0,1);
-      lcd.println("Invalid card?");
-      delay(2000);
-      changed = 1;
-      cashinserted = 0; //avoids bug where unautharised user gets previous user's balance
-    }else{
-      Serial.print("CURRENT USER ID IS:");
-      Serial.println(currentuser);
-      cashinserted = getuserbalance(currentuser);
-      changed = 1;
-      digitalWrite(inhibitpin, LOW);
+  if(currentuser == "-1"){
+      //Serial.println("Getting UID...");
+      uidstring = getUID();
+      //Serial.println("Read UID as =");
+      //Serial.println(uidstring);
+      if(uidstring != "-1"){
+        currentuser = userinfo(uidstring);
+        for(int i = 0; i > 4; i++){
+          currentuser = userinfo(uidstring);
+          if(currentuser != "ERROR"){
+            break;
+          }
+        }
+          if(currentuser == "ERROR"){
+            Serial.println("ACSERVER QUERY ERROR (MOST LIKELY INVALID)");
+            lcd.clear();
+            lcd.setCursor(0,0);
+            lcd.println("ACServer Error");
+            lcd.setCursor(0,1);
+            lcd.println("Try again.");
+            delay(2000);
+            changed = true;
+            cashinserted = 0;
+            currentuser = "-1";
+          }else{
+            lastcardscan = millis();
+            Serial.print("CURRENT USER ID IS:");
+            Serial.println(currentuser);
+            cashinserted = getuserbalance(currentuser);
+            Serial.println("Got the balance");
+            changed = true;
+            timedout = false;
+            digitalWrite(inhibitpin, LOW);
+      }
     }
   }
 }
