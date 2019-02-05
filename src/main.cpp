@@ -60,6 +60,11 @@ IPAddress server_addr(206,189,115,163);
 EthernetClient client;
 String hostname = "acserver.lan.london.hackspace.org.uk";
 
+MySQL_Connection conn((Client *)&client);
+MySQL_Cursor cur = MySQL_Cursor(&conn);
+char user[] = "vend";              // MySQL user login username
+char password[] = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";        // MySQL user login password
+
 char acserver[] = "acserver.lan.london.hackspace.org.uk";
 String nodeid = "xxxxxxx";
 String secret = "xxxxxxx";
