@@ -11,3 +11,5 @@ set(CMAKE_C_COMPILER ${TOOLCHAIN_DIR}/bin/arm-none-eabi-gcc)
 set(CMAKE_CXX_COMPILER ${TOOLCHAIN_DIR}/bin/arm-none-eabi-g++)
 
 include_directories(${CMAKE_SOURCE_DIR}/targets/tivac-launchpad/tivac-core/variants/EK-TM4C1294XL)
+
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -T ${CMAKE_SOURCE_DIR}/targets/tivac-launchpad/tivac-core/variants/EK-TM4C1294XL/lm4fcpp_snowflake.ld")
