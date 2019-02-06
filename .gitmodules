@@ -1,0 +1,3 @@
+[submodule "targets/tivac-launchpad/tivac-core"]
+	path = targets/tivac-launchpad/tivac-core
+	url = https://github.com/energia/tivac-core.git
