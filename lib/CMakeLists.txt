@@ -1,14 +1,4 @@
 
-file(GLOB MYSQL_SOURCES    ${CMAKE_CURRENT_SOURCE_DIR}/MySQL_Connector_Arduino/src/*.cpp)
-
-add_library(mysql_connector_arduino ${MYSQL_SOURCES})
-target_include_directories(mysql_connector_arduino PUBLIC 
-                                    ${CMAKE_CURRENT_SOURCE_DIR}/MySQL_Connector_Arduino/src/)
-
-if(DEFINED ENERGIA_CORE)
-    target_link_libraries(mysql_connector_arduino tivac_ethernet)
-endif()
-
 file(GLOB KEYPAD_SOURCES    ${CMAKE_CURRENT_SOURCE_DIR}/Keypad/src/*.cpp)
 
 add_library(keypad ${KEYPAD_SOURCES})

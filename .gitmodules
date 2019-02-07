@@ -1,9 +1,6 @@
 [submodule "targets/tivac-launchpad/tivac-core"]
 	path = targets/tivac-launchpad/tivac-core
 	url = https://github.com/energia/tivac-core.git
-[submodule "lib/MySQL_Connector_Arduino"]
-	path = lib/MySQL_Connector_Arduino
-	url = https://github.com/ChuckBell/MySQL_Connector_Arduino.git
 [submodule "lib/Keypad"]
 	path = lib/Keypad
 	url = https://github.com/Chris--A/Keypad.git
@@ -19,3 +16,6 @@
 [submodule "lib/ArduinoJson"]
 	path = lib/ArduinoJson
 	url = https://github.com/bblanchon/ArduinoJson.git
+[submodule "targets/stm32/Arduino_Core_STM32"]
+	path = targets/stm32/Arduino_Core_STM32
+	url = https://github.com/stm32duino/Arduino_Core_STM32.git
