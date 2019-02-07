@@ -9,7 +9,7 @@
 	url = https://github.com/Chris--A/Keypad.git
 [submodule "lib/PN532"]
 	path = lib/PN532
-	url = git@github.com:londonhackspace/PN532.git
+	url = https://github.com/londonhackspace/PN532.git
 [submodule "lib/Adafruit_CharacterOLED"]
 	path = lib/Adafruit_CharacterOLED
 	url = https://github.com/ladyada/Adafruit_CharacterOLED.git
