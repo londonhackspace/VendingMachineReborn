@@ -27,7 +27,7 @@ fi
 if [ ! -d toolchain/Connected_Launchpad/bin ]; then
     pushd toolchain/Connected_Launchpad
     echo "Extracting Connected Launchpad toolchain"
-    tar --strip-components=1 -xjf toolchain/downloads/cl_toolchain.tar.bz2
+    tar --strip-components=1 -xjf ../downloads/cl_toolchain.tar.bz2
     popd
 fi
 
