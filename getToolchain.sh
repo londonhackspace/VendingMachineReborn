@@ -26,12 +26,12 @@ fi
 
 if [ ! -d toolchain/Connected_Launchpad/bin ]; then
     pushd toolchain/Connected_Launchpad
-    echo "Extracting Connected Launchpad DSLite"
-    tar --strip-components=1 -xjf ../downloads/cl_dslite.tar.bz2
+    echo "Extracting Connected Launchpad toolchain"
+    tar --strip-components=1 -xjf toolchain/downloads/cl_toolchain.tar.bz2
     popd
 fi
 
-if [ ! -d toolchain/DSLite/bin ]; then
+if [ ! -d toolchain/DSLite/DebugServer ]; then
     pushd toolchain/DSLite
     echo "Extracting Connected Launchpad DSLite"
     tar --strip-components=1 -xjf ../downloads/cl_dslite.tar.bz2
