@@ -4,6 +4,11 @@ cache:
   directories:
     - toolchain
 
+# no point building master for now
+branches:
+  except:
+  - master
+
 install: ./getToolchain.sh
 
 before_script:
