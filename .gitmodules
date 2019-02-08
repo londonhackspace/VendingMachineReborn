@@ -12,7 +12,7 @@
 	url = https://github.com/londonhackspace/PN532.git
 [submodule "lib/Adafruit_CharacterOLED"]
 	path = lib/Adafruit_CharacterOLED
-	url = https://github.com/ladyada/Adafruit_CharacterOLED.git
+	url = https://github.com/technobly/Adafruit_CharacterOLED/
 [submodule "lib/HttpClient"]
 	path = lib/HttpClient
 	url = https://github.com/zlalanne/HttpClient.git
