@@ -27,29 +27,29 @@ if [ ! -f toolchain/downloads/cl_dslite.tar.bz2 ]; then
     curl $DSLITE_TARBALL --output toolchain/downloads/cl_dslite.tar.bz2
 fi
 
-if [ ! -f toolchain/downloads/stm32_tools.tar.bz2 ]; then
+if [ ! -f toolchain/downloads/stm32_tools.tgz ]; then
     echo "Downloading STM32 Tools"
-    curl $STM32_TOOLS_TARBALL -L --output toolchain/downloads/stm32_tools.tar.bz2
+    curl $STM32_TOOLS_TARBALL -L --output toolchain/downloads/stm32_tools.tgz
 fi
 
 if [ ! -d toolchain/Connected_Launchpad/bin ]; then
     pushd toolchain/Connected_Launchpad
     echo "Extracting Connected Launchpad toolchain"
-    tar --strip-components=1 -xjf ../downloads/cl_toolchain.tar.bz2
+    tar --strip-components=1 -xf ../downloads/cl_toolchain.tar.bz2
     popd
 fi
 
 if [ ! -d toolchain/DSLite/DebugServer ]; then
     pushd toolchain/DSLite
     echo "Extracting Connected Launchpad DSLite"
-    tar --strip-components=1 -xjf ../downloads/cl_dslite.tar.bz2
+    tar --strip-components=1 -xf ../downloads/cl_dslite.tar.bz2
     popd
 fi
 
 if [ ! -d toolchain/stm32-tools/stlink ]; then
     pushd toolchain/stm32-tools
     echo "Extracting STM32 tools"
-    tar --strip-components=3 -xjf ../downloads/stm32_tools.tar.bz2
+    tar --strip-components=3 -xf ../downloads/stm32_tools.tgz
     popd
 fi
 
