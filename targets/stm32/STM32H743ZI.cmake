@@ -9,6 +9,7 @@ set(TOOLCHAIN_DIR ${PROJECT_SOURCE_DIR}/toolchain/Connected_Launchpad)
 
 set(CMAKE_C_COMPILER ${TOOLCHAIN_DIR}/bin/arm-none-eabi-gcc)
 set(CMAKE_CXX_COMPILER ${TOOLCHAIN_DIR}/bin/arm-none-eabi-g++)
+set(CMAKE_OBJCOPY ${TOOLCHAIN_DIR}/bin/arm-none-eabi-objcopy)
 
 include_directories(
     ${CMAKE_CURRENT_LIST_DIR}/Arduino_Core_STM32/system/Drivers/STM32H7xx_HAL_Driver/Inc
@@ -35,3 +36,5 @@ add_definitions(    -DARDUINO=100
                 )
 
 set(CMAKE_EXE_LINKER_FLAGS "-mthumb -mcpu=cortex-m7 -mfloat-abi=hard -mfpu=fpv4-sp-d16 -fsingle-precision-constant -ffreestanding -flto -T ${LINKER_SCRIPT}  -Wl,--gc-sections -Wl,--entry=Reset_Handler " CACHE STRING "")
+
+set(STLINK_CONFIG st_nucleo_h743zi.cfg)
