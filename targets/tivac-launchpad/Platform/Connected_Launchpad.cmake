@@ -10,6 +10,9 @@ include_directories(${CMAKE_SOURCE_DIR}/targets/tivac-launchpad/tivac-core/syste
 include_directories(${CMAKE_SOURCE_DIR}/targets/tivac-launchpad/tivac-core/cores/tivac)
 
 set(CMAKE_EXECUTABLE_SUFFIX .elf)
+set(SYSTEM_LIBRARY ConnectedLaunchpad::Core)
+
+set(CONNECTED_LAUNCHPAD 1)
 
 function(makeFlash TARGET)
     add_custom_target(flash 

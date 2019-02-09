@@ -1,19 +1,18 @@
 language: cpp
 
+env:
+  - TOOLCHAIN=tivac-launchpad/EK-TM4C1294XL.cmake
+  - TOOLCHAIN=stm32/STM32H743ZI.cmake
+
 cache:
   directories:
     - toolchain
-
-# no point building master for now
-branches:
-  except:
-  - master
 
 install: ./getToolchain.sh
 
 before_script:
   - mkdir build
   - cd build
-  - cmake ..  -DCMAKE_TOOLCHAIN_FILE=../targets/tivac-launchpad/EK-TM4C1294XL.cmake
+  - cmake ..  -DCMAKE_TOOLCHAIN_FILE=../targets/$TOOLCHAIN
 
 script: make

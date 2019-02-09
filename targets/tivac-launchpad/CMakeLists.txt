@@ -1,42 +1,58 @@
 # build for core Energia libraries
 
-file(GLOB TIVAC_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/tivac-core/cores/tivac/*.c
-                        ${CMAKE_CURRENT_SOURCE_DIR}/tivac-core/cores/tivac/avr/*.c
-                        ${CMAKE_CURRENT_SOURCE_DIR}/tivac-core/cores/tivac/*.cpp)
+AddVendorLibrary(
+    NAMESPACE ConnectedLaunchpad
+    TARGET Core
+    FILES 
+        ${CMAKE_CURRENT_SOURCE_DIR}/tivac-core/cores/tivac/*.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/tivac-core/cores/tivac/avr/*.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/tivac-core/cores/tivac/*.cpp
+    DEPENDENCIES
+        ${TIVA_SYSTEMLIB}
+)
 
-add_library(tivac_lib ${TIVAC_SOURCES})
-target_link_libraries(tivac_lib ${TIVA_SYSTEMLIB})
+AddVendorLibrary(
+    NAMESPACE ConnectedLaunchpad
+    TARGET Ethernet
+    FILES 
+        ${CMAKE_CURRENT_SOURCE_DIR}/tivac-core/libraries/Ethernet/*.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/tivac-core/libraries/Ethernet/*.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/tivac-core/libraries/Ethernet/utility/*.c
+    INCLUDES
+        ${CMAKE_CURRENT_SOURCE_DIR}/tivac-core/libraries/Ethernet
+    DEPENDENCIES
+        ConnectedLaunchpad::Core
+)
 
-file(GLOB TIVAC_ETHERNET_SOURCES    ${CMAKE_CURRENT_SOURCE_DIR}/tivac-core/libraries/Ethernet/*.cpp
-                                    ${CMAKE_CURRENT_SOURCE_DIR}/tivac-core/libraries/Ethernet/*.c
-                                    ${CMAKE_CURRENT_SOURCE_DIR}/tivac-core/libraries/Ethernet/utility/*.c)
+AddVendorLibrary(
+    NAMESPACE ConnectedLaunchpad
+    TARGET EEPROM
+    FILES 
+        ${CMAKE_CURRENT_SOURCE_DIR}/tivac-core/libraries/EEPROM/*.cpp
+    INCLUDES
+        ${CMAKE_CURRENT_SOURCE_DIR}/tivac-core/libraries/EEPROM
+    DEPENDENCIES
+        ConnectedLaunchpad::Core
+)
 
-add_library(tivac_ethernet ${TIVAC_ETHERNET_SOURCES})
-target_include_directories(tivac_ethernet PUBLIC 
-                                    ${CMAKE_CURRENT_SOURCE_DIR}/tivac-core/libraries/Ethernet)
+AddVendorLibrary(
+    NAMESPACE ConnectedLaunchpad
+    TARGET wire
+    FILES 
+        ${CMAKE_CURRENT_SOURCE_DIR}/tivac-core/libraries/Wire/*.cpp
+    INCLUDES
+        ${CMAKE_CURRENT_SOURCE_DIR}/tivac-core/libraries/Wire
+    DEPENDENCIES
+        ConnectedLaunchpad::Core
+)
 
-target_link_libraries(tivac_ethernet tivac_lib)
-
-file(GLOB TIVAC_EEPROM_SOURCES    ${CMAKE_CURRENT_SOURCE_DIR}/tivac-core/libraries/EEPROM/*.cpp)
-
-add_library(tivac_eeprom ${TIVAC_EEPROM_SOURCES})
-target_include_directories(tivac_eeprom PUBLIC 
-                                    ${CMAKE_CURRENT_SOURCE_DIR}/tivac-core/libraries/EEPROM)
-
-target_link_libraries(tivac_eeprom tivac_lib)
-
-file(GLOB TIVAC_WIRE_SOURCES    ${CMAKE_CURRENT_SOURCE_DIR}/tivac-core/libraries/Wire/*.cpp)
-
-add_library(tivac_wire ${TIVAC_WIRE_SOURCES})
-target_include_directories(tivac_wire PUBLIC 
-                                    ${CMAKE_CURRENT_SOURCE_DIR}/tivac-core/libraries/Wire)
-
-target_link_libraries(tivac_wire tivac_lib)
-
-file(GLOB TIVAC_SPI_SOURCES    ${CMAKE_CURRENT_SOURCE_DIR}/tivac-core/libraries/SPI/*.cpp)
-
-add_library(tivac_spi ${TIVAC_SPI_SOURCES})
-target_include_directories(tivac_spi PUBLIC 
-                                    ${CMAKE_CURRENT_SOURCE_DIR}/tivac-core/libraries/SPI)
-
-target_link_libraries(tivac_spi tivac_lib)
+AddVendorLibrary(
+    NAMESPACE ConnectedLaunchpad
+    TARGET spi
+    FILES 
+        ${CMAKE_CURRENT_SOURCE_DIR}/tivac-core/libraries/SPI/*.cpp
+    INCLUDES
+        ${CMAKE_CURRENT_SOURCE_DIR}/tivac-core/libraries/SPI
+    DEPENDENCIES
+        ConnectedLaunchpad::Core
+)

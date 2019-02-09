@@ -19,3 +19,12 @@
 [submodule "targets/stm32/Arduino_Core_STM32"]
 	path = targets/stm32/Arduino_Core_STM32
 	url = https://github.com/stm32duino/Arduino_Core_STM32.git
+[submodule "targets/stm32/CMSIS_5"]
+	path = targets/stm32/CMSIS_5
+	url = https://github.com/ARM-software/CMSIS_5.git
+[submodule "targets/stm32/STM32Ethernet"]
+	path = targets/stm32/STM32Ethernet
+	url = https://github.com/stm32duino/STM32Ethernet.git
+[submodule "targets/stm32/LwIP"]
+	path = targets/stm32/LwIP
+	url = https://github.com/stm32duino/LwIP.git
