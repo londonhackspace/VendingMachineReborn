@@ -9,7 +9,7 @@ To build this you need:
 * CMake
 * Linux/macOS (I'll get Windows going at some point)
 
-### Make sure you have initialised submodules
+### Make sure you have initialised submodules
 This codebase uses submodules a lot for external dependencies. Make sure you have initialised them properly (and on every pull to be sure anything hasn't changed) with:
 
 ```
@@ -25,8 +25,7 @@ Firstly, you need the toolchains and utlitities for building for the target devi
 
 This is the only command that will touch the source directory. Everything else happens in the build directory. The toolchains are (mostly) from the relevant Arduino-like project.
 
-### Choose your target and initialise
-
+### Choose your target and initialise
 Right now this code supports:
 
 * [TI Connected Launchpad](http://www.ti.com/tool/EK-TM4C1294XL)
@@ -64,7 +63,7 @@ make -j5
 ```
 See? that was easy! change the number after -j to use more or fewer cores. the number of cores in your system plus one is a good default.
 
-### Deploy to a device
+### Deploy to a device
 
 There's a makefile target for deploying to a target device:
 
@@ -76,7 +75,7 @@ make flash
 
 The code uses Arduino cores and libraries for the main functionality. Libraries are in the `lib` directory, and exist as CMake targets for linking against.
 
-### Directory structure
+### Directory structure
 
 * cmake - contains CMake scripts
 * lib - contains Arduino libraries as submodules
@@ -90,17 +89,17 @@ The code uses Arduino cores and libraries for the main functionality. Libraries 
 
 The aim of this code structure is to allow experimentation and flexibility. Depending on the hardware in use, you might want to use a different display, or interface to a different coin mechanism. This is allowed for by a modular code structure. In addition, it should be possible to run as much of the code as possible on desktop systems, for easier testing and debugging. 
 
-### Rules of thumb of where to put code
+### Rules of thumb of where to put code
 
 * If it's generic and reusable, put it in src/Core
 * If it's something you might or might not want to use, put it in src/Modules
 * If it's fairly low level, and specific to a single piece of hardware or board, put it in src/HAL
 
-## Code Style
+## Code Style
 
 I don't want to be too rigid here, however some common style makes things easier.
 
-### General
+### General
 
 * Spaces not tabs (four of them please)
 * Try to keep lines short. I'm not going to specify a hard limit though
@@ -115,7 +114,7 @@ I don't want to be too rigid here, however some common style makes things easier
 * The last line of a file should be blank
   * This both feels cleaner, and avoids some weird results when including files where the last part is a comment
 
-### Naming
+### Naming
 
 * Classes are camel case, starting with a capital letter and are UpperCamelCase
   * AThingThatDoesStuff
@@ -136,7 +135,7 @@ I don't want to be too rigid here, however some common style makes things easier
   * The compilers we care about all support it, and it saves the mess of usual include guards
 
 
-## Current Notes
+## Current Notes
 
 Here are a few things to watch out for:
 
