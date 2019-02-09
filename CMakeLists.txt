@@ -7,11 +7,15 @@ if(DEFINED CONNECTED_LAUNCHPAD)
     add_subdirectory(targets/tivac-launchpad/)
 elseif(DEFINED STM32)
     add_subdirectory(targets/stm32/)
+else()
+    # Desktop build
+    function(makeFlash)
+
+    endfunction()
 endif()
 
-add_subdirectory(lib)
+if(CMAKE_CROSSCOMPILING)
+    add_subdirectory(lib)
+endif()
 
-add_executable(VendingMachineReborn src/main.cpp)
-target_link_libraries(VendingMachineReborn ${SYSTEM_LIBRARY} keypad PN532_HSU adafruit_character_oled httpclient arduinojson)
-
-makeFlash(VendingMachineReborn)
+add_subdirectory(src)

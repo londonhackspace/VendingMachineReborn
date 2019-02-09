@@ -27,8 +27,7 @@ set(CMAKE_C_FLAGS "-g -Os -std=gnu11 -ffunction-sections -fdata-sections -ffrees
 
 set(CMAKE_CXX_FLAGS "-g -Os -std=gnu++11 -ffunction-sections -fdata-sections -ffreestanding --param max-inline-insns-single=500 -fno-threadsafe-statics --param max-inline-insns-single=500 -fno-rtti -fno-exceptions -fno-rtti -fno-use-cxa-atexit -fno-threadsafe-statics  -MMD  -mcpu=cortex-m7 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb  -specs=nano.specs "  CACHE STRING "")
 
-add_definitions(    -DARDUINO=100 
-                    -DHAL_UART_MODULE_ENABLED
+add_definitions(
                     -DBOARD_NAME=NUCLEO_H743ZI
                     -DARDUINO_NUCLEO_H743ZI
                     -DSTM32H7xx 

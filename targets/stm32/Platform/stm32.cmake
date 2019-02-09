@@ -11,6 +11,11 @@ set(SYSTEM_LIBRARY stm32::Core)
 
 set(CMAKE_ASM_SOURCE_FILE_EXTENSIONS "${CMAKE_ASM_SOURCE_FILE_EXTENSIONS} .S")
 
+add_definitions(    -DARDUINO=100 
+                    -DHAL_UART_MODULE_ENABLED
+                    -DSTM32
+                )
+
 function(makeFlash TARGET)
     add_custom_target(${TARGET}.bin
         COMMAND ${CMAKE_OBJCOPY} -O binary $<TARGET_FILE:${TARGET}> $<TARGET_FILE:${TARGET}>.bin
