@@ -1,8 +1,8 @@
 language: cpp
 
 env:
-  - OPTIONS=-DCMAKE_TOOLCHAIN_FILE=../targets/tivac-launchpad/EK-TM4C1294XL.cmake
-  - OPTIONS=-DCMAKE_TOOLCHAIN_FILE=../targets/stm32/STM32H743ZI.cmake
+  - RUN_TESTS=false OPTIONS=-DCMAKE_TOOLCHAIN_FILE=../targets/tivac-launchpad/EK-TM4C1294XL.cmake
+  - RUN_TESTS=false OPTIONS=-DCMAKE_TOOLCHAIN_FILE=../targets/stm32/STM32H743ZI.cmake
   - RUN_TESTS=true OPTIONS=
 
 cache:
