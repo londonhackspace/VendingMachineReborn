@@ -11,14 +11,17 @@ cache:
 
 install:
   - ./getToolchain.sh
-    if not env(HOST) = true
+    if: not env(HOST) = true
 
 before_script:
   - mkdir build
   - cd build
   - cmake ..  $OPTIONS
 
-script: 
-  - make
-  - make test
-    if env(HOST) = true
+jobs:
+  include:
+    - stage: build
+      script: make
+    - stage: test
+      if: env(HOST) = true
+      script:  make test
