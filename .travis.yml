@@ -10,7 +10,7 @@ cache:
     - toolchain
 
 install:
-  - if [ RUN_TESTS != "true" ]; then ./getToolchain.sh; fi
+  - if [ $RUN_TESTS != "true" ]; then ./getToolchain.sh; fi
 
 before_script:
   - mkdir build
@@ -19,4 +19,4 @@ before_script:
 
 script: 
   - make
-  - if [ RUN_TESTS == "true" ]; then make test; fi
+  - if [ $RUN_TESTS == "true" ]; then make test; fi
