@@ -9,19 +9,24 @@ cache:
   directories:
     - toolchain
 
-install:
-  - ./getToolchain.sh
-    if: not env(HOST) = true
-
 before_script:
   - mkdir build
-  - cd build
-  - cmake ..  $OPTIONS
 
 jobs:
   include:
+    - stage: get toolchain
+      if: env(HOST) != true
+      script: ./getToolchain.sh
+    - stage: cmake
+      script:
+        - cd build
+        - cmake .. $OPTIONS
     - stage: build
-      script: make
+      script:
+        - make
+        - cd build
     - stage: test
       if: env(HOST) = true
-      script:  make test
+      script: 
+        - cd build
+        - make test
