@@ -1,0 +1,7 @@
+#pragma once
+
+#cmakedefine DISPLAY_TYPE_DUMMY
+#cmakedefine CARD_READER_TYPE_DUMMY
+#cmakedefine VEND_INTERFACE_TYPE_DUMMY
+
+#cmakedefine01 CMAKE_CROSSCOMPILING

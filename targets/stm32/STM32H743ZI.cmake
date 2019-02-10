@@ -23,9 +23,9 @@ include_directories(
 set(LINKER_SCRIPT ${CMAKE_CURRENT_LIST_DIR}/Arduino_Core_STM32/variants/NUCLEO_H743ZI/ldscript.ld)
 
 # TODO: Tune these - they're Launchpad ones butchered
-set(CMAKE_C_FLAGS "-g -Os -std=gnu11 -ffunction-sections -fdata-sections -ffreestanding --param max-inline-insns-single=500 -MMD -mcpu=cortex-m7 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -specs=nano.specs " CACHE STRING "")
+set(CMAKE_C_FLAGS "-g -Os -ffunction-sections -fdata-sections -ffreestanding --param max-inline-insns-single=500 -MMD -mcpu=cortex-m7 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -specs=nano.specs " CACHE STRING "")
 
-set(CMAKE_CXX_FLAGS "-g -Os -std=gnu++11 -ffunction-sections -fdata-sections -ffreestanding --param max-inline-insns-single=500 -fno-threadsafe-statics --param max-inline-insns-single=500 -fno-rtti -fno-exceptions -fno-rtti -fno-use-cxa-atexit -fno-threadsafe-statics  -MMD  -mcpu=cortex-m7 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb  -specs=nano.specs "  CACHE STRING "")
+set(CMAKE_CXX_FLAGS "-g -Os -ffunction-sections -fdata-sections -ffreestanding --param max-inline-insns-single=500 -fno-threadsafe-statics --param max-inline-insns-single=500 -fno-rtti -fno-exceptions -fno-rtti -fno-use-cxa-atexit -fno-threadsafe-statics  -MMD  -mcpu=cortex-m7 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb  -specs=nano.specs "  CACHE STRING "")
 
 add_definitions(
                     -DBOARD_NAME=NUCLEO_H743ZI

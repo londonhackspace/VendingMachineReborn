@@ -7,7 +7,18 @@
 Written to stop tgreer from throwing the vending machine away
 */
 
+#include "VendingMachineConfig.h"
+
+//if we are cross compiling, pull in Arduino.h
+#if CMAKE_CROSSCOMPILING
 #include <Arduino.h>
+#else
+// dummy main for desktop use
+int main(int argc, char** argv)
+{
+    return 0;
+}
+#endif
 
 void setup()
 {

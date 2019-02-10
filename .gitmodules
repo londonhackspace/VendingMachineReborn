@@ -28,3 +28,6 @@
 [submodule "targets/stm32/LwIP"]
 	path = targets/stm32/LwIP
 	url = https://github.com/stm32duino/LwIP.git
+[submodule "lib/googletest"]
+	path = lib/googletest
+	url = https://github.com/google/googletest.git

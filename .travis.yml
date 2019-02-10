@@ -1,18 +1,24 @@
 language: cpp
 
 env:
-  - TOOLCHAIN=tivac-launchpad/EK-TM4C1294XL.cmake
-  - TOOLCHAIN=stm32/STM32H743ZI.cmake
+  - OPTIONS=-DCMAKE_TOOLCHAIN_FILE=../targets/tivac-launchpad/EK-TM4C1294XL.cmake
+  - OPTIONS=-DCMAKE_TOOLCHAIN_FILE=../targets/stm32/STM32H743ZI.cmake
+  - HOST=true OPTIONS=
 
 cache:
   directories:
     - toolchain
 
-install: ./getToolchain.sh
+install:
+  - ./getToolchain.sh
+    if not env(HOST) = true
 
 before_script:
   - mkdir build
   - cd build
-  - cmake ..  -DCMAKE_TOOLCHAIN_FILE=../targets/$TOOLCHAIN
+  - cmake ..  $OPTIONS
 
-script: make
+script: 
+  - make
+  - make test
+    if env(HOST) = true
