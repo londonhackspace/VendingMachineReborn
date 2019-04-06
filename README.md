@@ -85,6 +85,9 @@ The code uses Arduino cores and libraries for the main functionality. Libraries 
   * src/Modules - contains modules, such as display implementations
 * targets - contains board-specific configuration and core libraries
 
+The difference between modules, targets and HAL parts is perhaps best described with the following example:
+Let's say you want to talk to a PN532 RFID reader. You need a module to implement the RFID reader interface in terms of this device. You also need a HAL layer to determine how the PN532 is connected to a particular board. The targets directory is intended for core libraries (mostly from upstream projects) such as Energia/STM32Duino libraries.
+
 ### Modularity Goals
 
 The aim of this code structure is to allow experimentation and flexibility. Depending on the hardware in use, you might want to use a different display, or interface to a different coin mechanism. This is allowed for by a modular code structure. In addition, it should be possible to run as much of the code as possible on desktop systems, for easier testing and debugging. 
@@ -94,6 +97,9 @@ The aim of this code structure is to allow experimentation and flexibility. Depe
 * If it's generic and reusable, put it in src/Core
 * If it's something you might or might not want to use, put it in src/Modules
 * If it's fairly low level, and specific to a single piece of hardware or board, put it in src/HAL
+* If it's silicon support, put it in targets.
+
+The difference between these last two is that a chip might be put onto a different board, but if you do so, the pins might need to be remapped.
 
 ## Code Style
 
