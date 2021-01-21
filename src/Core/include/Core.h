@@ -18,6 +18,10 @@ public:
 
     ConfigManager& getConfigManager() override;
 
+    void setup();
+
+    void run();
+
 private:
     HALFactory* halFactory;
     ConfigManager configManager;

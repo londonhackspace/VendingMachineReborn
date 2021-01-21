@@ -34,6 +34,9 @@ add_definitions(
                     -DSTM32H743xx
                 )
 
+set(STNUCLEO144 1)
+set(NUCLEO_H743ZI 1)
+
 set(CMAKE_EXE_LINKER_FLAGS "-mthumb -mcpu=cortex-m7 -mfloat-abi=hard -mfpu=fpv4-sp-d16 -fsingle-precision-constant -ffreestanding -flto -T ${LINKER_SCRIPT}  -Wl,--gc-sections -Wl,--entry=Reset_Handler " CACHE STRING "")
 
 set(STLINK_CONFIG st_nucleo_h743zi.cfg)

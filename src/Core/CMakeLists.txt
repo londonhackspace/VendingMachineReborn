@@ -8,6 +8,8 @@ set(CORE_SOURCES
 
 add_library(Core ${CORE_SOURCES})
 
+target_link_libraries(Core HALFactory)
+
 if(TESTING)
     add_subdirectory(tests)
 endif()

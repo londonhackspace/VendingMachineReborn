@@ -6,6 +6,8 @@
 |_____|_| |_|____/     \_/  |_____|_| \_|____/___|_| \_|\____| |_|  |_/_/   \_\____|_| |_|___|_| \_|_____|
 Written to stop tgreer from throwing the vending machine away
 */
+#include <HALFactory.h>
+#include <Core.h>
 
 #include "VendingMachineConfig.h"
 
@@ -13,19 +15,27 @@ Written to stop tgreer from throwing the vending machine away
 #if CMAKE_CROSSCOMPILING
 #include <Arduino.h>
 #else
+
+void setup();
+void loop();
+
 // dummy main for desktop use
 int main(int argc, char** argv)
 {
+    setup();
     return 0;
 }
 #endif
 
+VendingMachine::Core::HALFactory hf;
+VendingMachine::Core::Core core(&hf);
+
 void setup()
 {
-  
+    core.setup();
 }
 
 void loop()
 {
-                        // wait for a second
+    core.run();
 }

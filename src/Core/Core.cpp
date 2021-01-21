@@ -34,4 +34,14 @@ ConfigManager& Core::getConfigManager()
     return configManager;
 }
 
+void Core::setup()
+{
+    
+}
+
+void Core::run()
+{
+
+}
+
 }}
